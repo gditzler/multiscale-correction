@@ -30,6 +30,7 @@ class DenseNet121:
         self.image_size = image_size
         self.learning_rate = learning_rate
         self.histories = []
+        self.epochs = epochs
         
         model_res = tf.keras.applications.densenet.DenseNet121(
             weights='imagenet', 
