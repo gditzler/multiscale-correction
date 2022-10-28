@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
+import pickle 
 import argparse
 import tensorflow as tf 
 
@@ -80,4 +82,9 @@ if __name__ == '__main__':
         epslison=args.epsilon,
         clip_values=(0,1)
     )
-    X = attack.attack(network.network, dataset.X_train, dataset.y_train)
+    X = attack.attack(network.network, dataset.X_valid, dataset.y_valid)
+    pickle.dump(
+        {'X_adv': X, 'args': args}, 
+        open(args.output)
+    )
+    
