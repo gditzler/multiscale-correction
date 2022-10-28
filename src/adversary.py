@@ -20,4 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import tenortflow as tf 
+import tensorflow as tf 
+
+from art.estimators.classification import KerasClassifier
+from art.attacks.evasion import FastGradientMethod
+
+class Attacker: 
+    def __init__(self, attack_type:str='FastGradientMethod', epsilon:float=0.1, clip_values:tuple=(0, 1)): 
+        self.epsilon = epsilon
+        self.attack_type = attack_type
+        self.clip_values = clip_values
+        
+    def attack(self, network, X, y=None): 
+        classifier = KerasClassifier(model=network, clip_values=self.clip_values)
+        
+        if self.attack_type == 'FastGradientMethod': 
+            adv_crafter = FastGradientMethod(classifier, eps=self.epsilon)
+            Xadv = adv_crafter.generate(x=X)
+        else: 
+            ValueError('Unknown attack type')
+        
+        return Xadv

@@ -21,11 +21,11 @@
 # SOFTWARE.
 
 import argparse
-from ast import parse
 import tensorflow as tf 
+
 from src.utils import DataLoader
 from src.models import DenseNet121
-
+from src.adversary import Attacker
 
 
 parser = argparse.ArgumentParser(
@@ -65,7 +65,8 @@ if __name__ == '__main__':
         image_size=160, 
         batch_size=128, 
         rotation=40, 
-        augment=False
+        augment=False, 
+        store_numpy=True
     )
     network = DenseNet121(
         learning_rate=0.0005, 
@@ -73,3 +74,10 @@ if __name__ == '__main__':
         epochs=50
     )
     network.train(dataset)
+    
+    attack = Attacker(
+        attack_type=args.attack, 
+        epslison=args.epsilon,
+        clip_values=(0,1)
+    )
+    X = attack.attack(network.network, dataset.X_train, dataset.y_train)

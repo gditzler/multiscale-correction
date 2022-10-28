@@ -27,13 +27,17 @@ import tensorflow_datasets as tfds
 class DataLoader(): 
     """_summary_
     """
-    def __init__(self, image_size:int=160, batch_size:int=128, rotation:int=40, augment:bool=False): 
+    def __init__(self, image_size:int=160, batch_size:int=128, rotation:int=40, augment:bool=False, store_numpy:bool=False): 
         self.n_classes = 10 
         self.image_size = image_size
         self.batch_size = batch_size
         self.input_shape = (self.image_size, self.image_size, 3)
         self.rotation = rotation
         self.augment = augment
+        self.train_ds, self.valid_ds = None, None  
+        self.y_valid, self.y_train = None, None 
+        self.X_valid, self.X_train = None, None 
+        self.store_numpy = store_numpy
         self._load_data()
     
     
@@ -79,5 +83,10 @@ class DataLoader():
             image_data_generator=valid_datagen,
             batch_size=self.batch_size
         )
+        if self.store_numpy: 
+            self.X_train = np.array(X_train)/255.
+            self.y_train = np.array(y_train)
+            self.X_valid = np.array(X_valid)/255. 
+            self.y_valid = np.array(y_valid)
 
 
