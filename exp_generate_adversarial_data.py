@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
 import pickle 
 import argparse
 import tensorflow as tf 
@@ -55,7 +54,7 @@ parser.add_argument(
     '-e', '--epsilon', 
     type=float, 
     default=0.1, 
-    help='Attack \epsilon'
+    help='Attack epsilon'
 )
 
 args = parser.parse_args() 
@@ -84,7 +83,10 @@ if __name__ == '__main__':
     )
     X = attack.attack(network.network, dataset.X_valid, dataset.y_valid)
     pickle.dump(
-        {'X_adv': X, 'args': args}, 
+        {
+            'X_adv': X, 
+            'args': args
+        }, 
         open(args.output)
     )
     
