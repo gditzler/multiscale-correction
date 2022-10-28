@@ -20,11 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
 import numpy as np 
 import tensorflow as tf
 import tensorflow_datasets as tfds
-
 
 class DataLoader(): 
     """_summary_
