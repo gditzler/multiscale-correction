@@ -23,15 +23,16 @@
 import tensorflow as tf 
 
 from art.estimators.classification import TensorFlowV2Classifier
-from art.attacks.evasion import FastGradientMethod, DeepFool
+from art.attacks.evasion import FastGradientMethod, DeepFool, ProjectedGradientDescent
 
 class Attacker: 
-    def __init__(self, attack_type:str='FastGradientMethod', epsilon:float=0.1, clip_values:tuple=(0, 1), image_shape:tuple=(160,160,3), nb_classes:int=10): 
+    def __init__(self, attack_type:str='FastGradientMethod', epsilon:float=0.1, clip_values:tuple=(0, 1), image_shape:tuple=(160,160,3), nb_classes:int=10, max_iter:int=10): 
         self.epsilon = epsilon
         self.attack_type = attack_type
         self.clip_values = clip_values
         self.image_shape = image_shape
         self.nb_classes = nb_classes
+        self.max_iter = max_iter
         
     def attack(self, network, X, y=None): 
         loss_object = tf.keras.losses.CategoricalCrossentropy(from_logits=False)
@@ -49,6 +50,8 @@ class Attacker:
         elif self.attack_type == 'DeepFool': 
             adv_crafter = DeepFool(classifier)
             Xadv = adv_crafter.generate(x=X)
+        elif self.attack_type == 'ProjectedGradientDescent': 
+            adv_crafter = ProjectedGradientDescent(classifier, eps=self.epsilon, max_iter=self.max_iter)
         else: 
             ValueError('Unknown attack type')
         
