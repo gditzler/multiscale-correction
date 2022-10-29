@@ -22,17 +22,26 @@
 
 import tensorflow as tf 
 
-from art.estimators.classification import KerasClassifier
+from art.estimators.classification import TensorFlowV2Classifier
 from art.attacks.evasion import FastGradientMethod
 
 class Attacker: 
-    def __init__(self, attack_type:str='FastGradientMethod', epsilon:float=0.1, clip_values:tuple=(0, 1)): 
+    def __init__(self, attack_type:str='FastGradientMethod', epsilon:float=0.1, clip_values:tuple=(0, 1), image_shape:tuple=(160,160,3), nb_classes:int=10): 
         self.epsilon = epsilon
         self.attack_type = attack_type
         self.clip_values = clip_values
+        self.image_shape = image_shape
+        self.nb_classes = nb_classes
         
     def attack(self, network, X, y=None): 
-        classifier = KerasClassifier(model=network, clip_values=self.clip_values)
+        loss_object = tf.keras.losses.CategoricalCrossentropy(from_logits=False)
+        classifier = TensorFlowV2Classifier(
+            model=network,
+            loss_object=loss_object, 
+            nb_classes=self.nb_classes,
+            input_shape=self.image_shape,
+            clip_values=self.clip_values,
+        )
         
         if self.attack_type == 'FastGradientMethod': 
             adv_crafter = FastGradientMethod(classifier, eps=self.epsilon)

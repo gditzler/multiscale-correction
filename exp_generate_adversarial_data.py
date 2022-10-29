@@ -28,7 +28,6 @@ from src.utils import DataLoader
 from src.models import DenseNet121
 from src.adversary import Attacker
 
-
 parser = argparse.ArgumentParser(
     description = 'What the program does',
     epilog = 'Text at the bottom of help'
@@ -50,15 +49,9 @@ parser.add_argument(
     default='FastGradientMethod', 
     help='Attack [FastGradientMethod]'
 )
-parser.add_argument(
-    '-e', '--epsilon', 
-    type=float, 
-    default=0.1, 
-    help='Attack epsilon'
-)
 
 args = parser.parse_args() 
-
+epsilons = [(i+1)/100 for i in range(20)]
 
 if __name__ == '__main__': 
     tf.random.set_seed(args.seed)
@@ -72,20 +65,23 @@ if __name__ == '__main__':
     network = DenseNet121(
         learning_rate=0.0005, 
         image_size=160, 
-        epochs=50
+        epochs=10
     )
     network.train(dataset)
     
-    attack = Attacker(
-        attack_type=args.attack, 
-        epslison=args.epsilon,
-        clip_values=(0,1)
-    )
-    X = attack.attack(network.network, dataset.X_valid, dataset.y_valid)
-    pickle.dump(
-        {
-            'X_adv': X, 
-            'args': args
-        }, 
-        open(args.output)
-    )
+    if args.attack == 'FastGradientMethod': 
+        for eps in epsilons:
+            attack = Attacker(
+                attack_type=args.attack, 
+                epsilon=eps,
+                clip_values=(0,1)
+            )
+            X = attack.attack(network.network, dataset.X_valid, dataset.y_valid)
+            pickle.dump(
+                {
+                    'X_adv': X, 
+                    'y': dataset.y_valid, 
+                    'args': args
+                }, 
+                open(''.join([args.output, '/adversarial_fgsm_eps', str(eps), '.pkl']), 'wb')
+            )
