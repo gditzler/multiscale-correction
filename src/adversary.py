@@ -52,7 +52,7 @@ class Attacker:
             Xadv = adv_crafter.generate(x=X)
         elif self.attack_type == 'ProjectedGradientDescent': 
             adv_crafter = ProjectedGradientDescent(classifier, eps=self.epsilon, max_iter=self.max_iter)
-            Xadv = adv_crafter.generate(x=X)
+            Xadv = adv_crafter.generate(x=X, y=y)
         else: 
             ValueError('Unknown attack type')
         
