@@ -23,7 +23,7 @@
 import tensorflow as tf 
 
 from art.estimators.classification import TensorFlowV2Classifier
-from art.attacks.evasion import FastGradientMethod
+from art.attacks.evasion import FastGradientMethod, DeepFool
 
 class Attacker: 
     def __init__(self, attack_type:str='FastGradientMethod', epsilon:float=0.1, clip_values:tuple=(0, 1), image_shape:tuple=(160,160,3), nb_classes:int=10): 
@@ -45,6 +45,9 @@ class Attacker:
         
         if self.attack_type == 'FastGradientMethod': 
             adv_crafter = FastGradientMethod(classifier, eps=self.epsilon)
+            Xadv = adv_crafter.generate(x=X)
+        elif self.attack_type == 'DeepFool': 
+            adv_crafter = DeepFool(classifier)
             Xadv = adv_crafter.generate(x=X)
         else: 
             ValueError('Unknown attack type')

@@ -1,6 +1,7 @@
 # files 
 *.pyc
 .DS_Store 
+outputs/Adversarial*.pkl
 
 # folders 
 

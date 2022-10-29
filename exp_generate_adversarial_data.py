@@ -59,7 +59,7 @@ if __name__ == '__main__':
         image_size=160, 
         batch_size=128, 
         rotation=40, 
-        augment=False, 
+        augment=False,  
         store_numpy=True
     )
     network = DenseNet121(
@@ -83,5 +83,21 @@ if __name__ == '__main__':
                     'y': dataset.y_valid, 
                     'args': args
                 }, 
-                open(''.join([args.output, '/adversarial_fgsm_eps', str(eps), '.pkl']), 'wb')
+                open(''.join([args.output, '/Adversarial_', args.attack, '_eps', str(eps), '.pkl']), 'wb')
             )
+    elif args.attack == 'DeepFool':
+        attack = Attacker(
+            attack_type=args.attack, 
+            clip_values=(0,1)
+        ) 
+        X = attack.attack(network.network, dataset.X_valid, dataset.y_valid)
+        pickle.dump(
+            {
+                'X_adv': X, 
+                'y': dataset.y_valid, 
+                'args': args
+            }, 
+            open(''.join([args.output, '/Adversarial_', args.attack, '.pkl']), 'wb')
+        )
+    else: 
+        ValueError(''.join(['Unknown attack ', args.attack]))
