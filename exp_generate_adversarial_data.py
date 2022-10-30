@@ -69,12 +69,12 @@ if __name__ == '__main__':
     )
     network.train(dataset)
     
-    if args.attack == 'FastGradientMethod': 
+    if args.attack == 'FastGradientMethod' or args.attack == 'ProjectedGradientDescent': 
         for eps in epsilons:
             attack = Attacker(
-                attack_type=args.attack, 
-                epsilon=eps,
-                clip_values=(0,1)
+                    attack_type=args.attack, 
+                    epsilon=eps,
+                    clip_values=(0,1)
             )
             X = attack.attack(network.network, dataset.X_valid, dataset.y_valid)
             pickle.dump(
