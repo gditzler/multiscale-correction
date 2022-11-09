@@ -46,7 +46,7 @@ class VanillaCNN:
         x = tf.keras.layers.Conv2D(128, KERNEL_SIZE, activation='elu', kernel_initializer='he_uniform', padding='same', strides=(2, 2))(x)
         x = tf.keras.layers.MaxPooling2D((2, 2))(x)
         
-        x = tf.keras.layers.Flatten()(model_res.output)
+        x = tf.keras.layers.Flatten()(x)
         x = tf.keras.layers.Dense(1024, activation='relu')(x)
         x = tf.keras.layers.Dropout(0.25)(x)
         x = tf.keras.layers.Dense(512, activation='relu')(x)
