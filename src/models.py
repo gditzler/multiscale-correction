@@ -24,6 +24,53 @@
 import tensorflow as tf 
 
 
+class VanillaCNN:
+    
+    def __init__(self, learning_rate:float=0.0005, image_size:int=160, epochs:int=50):
+        self.image_size = image_size
+        self.learning_rate = learning_rate
+        self.histories = []
+        self.epochs = epochs
+        KERNEL_SIZE = (3, 3)
+        
+        input = tf.keras.layers.Input(shape=(image_size, image_size, 3), name="image")
+        x = tf.keras.layers.Conv2D(32, KERNEL_SIZE, activation='elu', kernel_initializer='he_uniform', padding='same')(input)
+        x = tf.keras.layers.Conv2D(32, KERNEL_SIZE, activation='elu', kernel_initializer='he_uniform', padding='same')(x) 
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x) 
+        x = tf.keras.layers.Dropout(0.2)(x)
+        x = tf.keras.layers.Conv2D(64, KERNEL_SIZE, activation='elu', kernel_initializer='he_uniform', padding='same')(x) 
+        x = tf.keras.layers.Conv2D(64, KERNEL_SIZE, activation='elu', kernel_initializer='he_uniform', padding='same', strides=(2, 2))(x)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+        x = tf.keras.layers.Dropout(0.2)(x)
+        x = tf.keras.layers.Conv2D(128, KERNEL_SIZE, activation='elu', kernel_initializer='he_uniform', padding='same'), 
+        x = tf.keras.layers.Conv2D(128, KERNEL_SIZE, activation='elu', kernel_initializer='he_uniform', padding='same', strides=(2, 2))(x)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+        
+        x = tf.keras.layers.Flatten()(model_res.output)
+        x = tf.keras.layers.Dense(1024, activation='relu')(x)
+        x = tf.keras.layers.Dropout(0.25)(x)
+        x = tf.keras.layers.Dense(512, activation='relu')(x)
+        x = tf.keras.layers.Dropout(0.25)(x)
+        x = tf.keras.layers.Dense(256, activation='relu')(x)
+        predictions = tf.keras.layers.Dense(10, activation = 'softmax')(x)
+
+        model_res = tf.keras.Model(inputs=input, outputs=predictions)
+
+        model_res.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=self.learning_rate), 
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False), 
+                  metrics=['accuracy'])
+        self.network = model_res
+    
+    def train(self, dataset): 
+        history = self.network.fit(
+            dataset.train_ds,
+            validation_data=dataset.valid_ds,
+            epochs=self.epochs,
+            verbose=1
+        )
+        self.histories.append(history) 
+ 
+
 class DenseNet121:
     
     def __init__(self, learning_rate:float=0.0005, image_size:int=160, epochs:int=50):
@@ -66,6 +113,63 @@ class DenseNet121:
         
 
 class MultiResolutionNetwork: 
-    def __init__(self, image_sizes:list=[32,64,160]): 
-        model = DenseNet121()
+    def __init__(self, image_sizes:list=[32,64,160], learning_rate:float=0.0005, epochs:int=10): 
+        
+        if len(image_sizes) != 3: 
+            raise(ValueError(''.join([
+                'image_sizes must be of length 3. Currently, len(', 
+                str(image_sizes),
+                ') = ', 
+                str(len(image_sizes))])))
+        
+        
+        self.image_sizes = image_sizes
+        self.learning_rate = learning_rate
+        self.histories = []
+        self.epochs = epochs
+       
+        # MODEL 01  
+        model_01 = tf.keras.applications.densenet.DenseNet121(
+            weights='imagenet', 
+            include_top=False, 
+            input_shape=(self.image_sizes[0], self.image_sizes[0], 3)
+        )
+        for layer in model_01.layers:
+            layer.trainable = True
+
+        # MODEL 02 
+        model_02 = tf.keras.applications.densenet.DenseNet121(
+            weights='imagenet', 
+            include_top=False, 
+            input_shape=(self.image_sizes[1], self.image_sizes[1], 3)
+        )
+        for layer in model_02.layers:
+            layer.trainable = True
+
+
+        # MODEL 03
+        model_03 = tf.keras.applications.densenet.DenseNet121(
+            weights='imagenet', 
+            include_top=False, 
+            input_shape=(self.image_sizes[2], self.image_sizes[2], 3)
+        )
+        for layer in model_03.layers:
+            layer.trainable = True
+            
+        
+        x = tf.keras.layers.Flatten()(model_01.output)
+        x = tf.keras.layers.Dense(1024, activation='relu')(x)
+        y = tf.keras.layers.Flatten()(model_02.output)
+        y = tf.keras.layers.Dense(1024, activation='relu')(y)
+        z = tf.keras.layers.Flatten()(model_03.output)
+        z = tf.keras.layers.Dense(1024, activation='relu')(z)
+        x = x + y + z 
+        
+        x = tf.keras.layers.Dropout(0.25)(x)
+        x = tf.keras.layers.Dense(512, activation='relu')(x)
+        x = tf.keras.layers.Dropout(0.25)(x)
+        x = tf.keras.layers.Dense(256, activation='relu')(x)
+        predictions = tf.keras.layers.Dense(10, activation = 'softmax')(x)
+
+        model_res = tf.keras.Model(inputs=model_res.input, outputs=predictions)
           
