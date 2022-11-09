@@ -29,7 +29,7 @@ from src.models import DenseNet121
 from src.adversary import Attacker
 
 parser = argparse.ArgumentParser(
-    description = 'What the program does',
+    description = 'Generate the adversarial samples using the Imagenette dataset',
     epilog = 'Text at the bottom of help'
 ) 
 parser.add_argument(
@@ -69,7 +69,9 @@ if __name__ == '__main__':
     )
     network.train(dataset)
     
-    if args.attack == 'FastGradientMethod' or args.attack == 'ProjectedGradientDescent': 
+    if args.attack == 'FastGradientMethod' or args.attack == 'ProjectedGradientDescent':
+        # the attacker function call for the FGSM and PGD attack are the same since we
+        # need to loop over the different values of epsilon in the attack. 
         for eps in epsilons:
             attack = Attacker(
                     attack_type=args.attack, 
