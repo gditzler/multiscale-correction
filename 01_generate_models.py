@@ -20,13 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
 import argparse
 import tensorflow as tf
 
 from src.utils import DataLoader, FusionDataLoader
 from src.models import DenseNet121, MultiResolutionNetwork
-
 
 parser = argparse.ArgumentParser(
     description = 'What the program does',
@@ -68,7 +66,6 @@ if __name__ == '__main__':
         epochs=10
     )
     network.train(dataset)
-    
     
     dataset = FusionDataLoader(
         image_size=[32, 64, 128], 
