@@ -22,7 +22,7 @@
 
 
 import tensorflow as tf 
-
+from .utils import DataGenFusion
 
 class VanillaCNN:
     
@@ -127,7 +127,9 @@ class MultiResolutionNetwork:
         self.learning_rate = learning_rate
         self.histories = []
         self.epochs = epochs
-       
+        
+        k = 0 
+        
         # MODEL 01  
         model_01 = tf.keras.applications.densenet.DenseNet121(
             weights='imagenet', 
@@ -136,6 +138,8 @@ class MultiResolutionNetwork:
         )
         for layer in model_01.layers:
             layer.trainable = True
+            layer._name = layer._name+'_'+str(k)
+            k += 1
 
         # MODEL 02 
         model_02 = tf.keras.applications.densenet.DenseNet121(
@@ -145,7 +149,8 @@ class MultiResolutionNetwork:
         )
         for layer in model_02.layers:
             layer.trainable = True
-
+            layer._name = layer._name+'_'+str(k)
+            k += 1
 
         # MODEL 03
         model_03 = tf.keras.applications.densenet.DenseNet121(
@@ -155,6 +160,8 @@ class MultiResolutionNetwork:
         )
         for layer in model_03.layers:
             layer.trainable = True
+            layer._name = layer._name+'_'+str(k)
+            k += 1
             
         
         x = tf.keras.layers.Flatten()(model_01.output)
@@ -163,13 +170,33 @@ class MultiResolutionNetwork:
         y = tf.keras.layers.Dense(1024, activation='relu')(y)
         z = tf.keras.layers.Flatten()(model_03.output)
         z = tf.keras.layers.Dense(1024, activation='relu')(z)
-        x = x + y + z 
+
+        x = tf.keras.layers.concatenate([x, y, z], name="concat_layer")
         
         x = tf.keras.layers.Dropout(0.25)(x)
         x = tf.keras.layers.Dense(512, activation='relu')(x)
         x = tf.keras.layers.Dropout(0.25)(x)
         x = tf.keras.layers.Dense(256, activation='relu')(x)
         predictions = tf.keras.layers.Dense(10, activation = 'softmax')(x)
+        
+        self.network = tf.keras.models.Model(
+            inputs=[model_01.input, model_02.input, model_03.input], 
+            outputs=predictions
+        ) 
+        self.network.compile(
+            optimizer=tf.keras.optimizers.SGD(learning_rate=self.learning_rate), 
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False), 
+            metrics=['accuracy']
+        )
+        
+    def train(self, dataset): 
+        history = self.network.fit(
+            dataset.train_ds,
+            validation_data=dataset.valid_ds,
+            epochs=self.epochs,
+            verbose=1
+        )
+        self.histories.append(history)  
 
-        model_res = tf.keras.Model(inputs=model_res.input, outputs=predictions)
+
           
