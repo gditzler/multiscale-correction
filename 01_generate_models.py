@@ -55,7 +55,6 @@ args = parser.parse_args()
 if __name__ == '__main__': 
     tf.random.set_seed(args.seed)
     
-    """
     # generate data 
     dataset = DataLoader(
         image_size=160, 
@@ -109,7 +108,6 @@ if __name__ == '__main__':
     with open(''.join([args.output, '/DenseNet121_60x60_seed_', str(args.seed), '.pkl']), 'wb') as file: 
         pickle.dump({'model': network}, file)
     
-    """
     # generate the multiresolution network 
     dataset = FusionDataLoader(
         image_size=[60, 80, 160], 
@@ -120,7 +118,6 @@ if __name__ == '__main__':
     network = MultiResolutionNetwork(
         image_sizes=[60, 80, 160], 
         learning_rate=0.0005, 
-        image_size=160, 
         epochs=10
     )
     network.train(dataset)
