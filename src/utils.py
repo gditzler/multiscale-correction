@@ -20,9 +20,25 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import pickle 
 import numpy as np 
 import tensorflow as tf
 import tensorflow_datasets as tfds
+
+
+
+class AMLLoader(): 
+    def __init__(self, file_path:str): 
+        self.file_path = file_path
+        with open(self.file_path, 'rb') as file: 
+            data = pickle.load(file)
+            X_adv, y = data['X_adv'], data['y']
+        self.data_shape = X_adv.shape
+        self.n_classes = len(np.unique(y))
+        self.input_shape = (self.data_shape[1], self.data_shape[2], self.data_shape[3])
+        self.X_160 = None 
+        self.X_80 = None 
+        self.X_60 = None 
 
 class DataLoader(): 
     """_summary_
