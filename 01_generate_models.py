@@ -75,6 +75,13 @@ if __name__ == '__main__':
         pickle.dump({'model': network}, file)
         
     # model 80x80
+    dataset = DataLoader(
+        image_size=80, 
+        batch_size=128, 
+        rotation=40, 
+        augment=False,  
+        store_numpy=True
+    )
     network = DenseNet121(
         learning_rate=0.0005, 
         image_size=80, 
@@ -85,6 +92,13 @@ if __name__ == '__main__':
         pickle.dump({'model': network}, file)
     
     # model 60x60
+    dataset = DataLoader(
+        image_size=60, 
+        batch_size=128, 
+        rotation=40, 
+        augment=False,  
+        store_numpy=True
+    )
     network = DenseNet121(
         learning_rate=0.0005, 
         image_size=60, 
