@@ -74,6 +74,26 @@ if __name__ == '__main__':
     with open(''.join([args.output, '/DenseNet121_160x160_seed_', str(args.seed), '.pkl'])) as file: 
         pickle.dump({'model': network}, file)
         
+    # model 80
+    network = DenseNet121(
+        learning_rate=0.0005, 
+        image_size=80, 
+        epochs=10
+    )
+    network.train(dataset)
+    with open(''.join([args.output, '/DenseNet121_80x80_seed_', str(args.seed), '.pkl'])) as file: 
+        pickle.dump({'model': network}, file)
+    
+    # model 
+    network = DenseNet121(
+        learning_rate=0.0005, 
+        image_size=60, 
+        epochs=10
+    )
+    network.train(dataset)
+    with open(''.join([args.output, '/DenseNet121_60x60_seed_', str(args.seed), '.pkl'])) as file: 
+        pickle.dump({'model': network}, file)
+    
     
     dataset = FusionDataLoader(
         image_size=[60, 80, 160], 
@@ -88,4 +108,6 @@ if __name__ == '__main__':
         epochs=10
     )
     network.train(dataset)
- 
+    with open(''.join([args.output, '/MultiResolutionNetwork_seed_', str(args.seed), '.pkl'])) as file: 
+        pickle.dump({'model': network}, file)
+    

@@ -114,12 +114,12 @@ class DenseNet121:
 class MultiResolutionNetwork: 
     def __init__(self, image_sizes:list=[32,64,160], learning_rate:float=0.0005, epochs:int=10): 
         
+        # require that we only have three image sizes... no more... no less. 
         if len(image_sizes) != 3: 
-            raise(ValueError(''.join([
-                'image_sizes must be of length 3. Currently, len(', 
-                str(image_sizes),
-                ') = ', 
-                str(len(image_sizes))])))
+            raise(ValueError(
+                ''.join(['image_sizes must be of length 3. Currently, len(', 
+                str(image_sizes), ') = ', str(len(image_sizes))])
+            ))
         
         
         self.image_sizes = image_sizes
@@ -127,9 +127,12 @@ class MultiResolutionNetwork:
         self.histories = []
         self.epochs = epochs
         
+        # need to set up an iterator than can be used to rename a layer of the network
+        # because layer names need to be changed since we are going to use the same type 
+        # of backbone. 
         k = 0 
         
-        # MODEL 01  
+        # MODEL 01 - image_size[0]
         model_01 = tf.keras.applications.densenet.DenseNet121(
             weights='imagenet', 
             include_top=False, 
@@ -140,7 +143,7 @@ class MultiResolutionNetwork:
             layer._name = layer._name+'_'+str(k)
             k += 1
 
-        # MODEL 02 
+        # MODEL 02 - image_size[1]
         model_02 = tf.keras.applications.densenet.DenseNet121(
             weights='imagenet', 
             include_top=False, 
@@ -151,7 +154,7 @@ class MultiResolutionNetwork:
             layer._name = layer._name+'_'+str(k)
             k += 1
 
-        # MODEL 03
+        # MODEL 03 - image_size[2]
         model_03 = tf.keras.applications.densenet.DenseNet121(
             weights='imagenet', 
             include_top=False, 
