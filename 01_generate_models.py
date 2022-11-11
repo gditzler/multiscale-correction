@@ -71,7 +71,7 @@ if __name__ == '__main__':
         epochs=10
     )
     network.train(dataset)
-    with open(''.join([args.output, '/DenseNet121_160x160_seed_', str(args.seed), '.pkl'])) as file: 
+    with open(''.join([args.output, '/DenseNet121_160x160_seed_', str(args.seed), '.pkl']), 'wb') as file: 
         pickle.dump({'model': network}, file)
         
     # model 80x80
@@ -81,7 +81,7 @@ if __name__ == '__main__':
         epochs=10
     )
     network.train(dataset)
-    with open(''.join([args.output, '/DenseNet121_80x80_seed_', str(args.seed), '.pkl'])) as file: 
+    with open(''.join([args.output, '/DenseNet121_80x80_seed_', str(args.seed), '.pkl']), 'wb') as file: 
         pickle.dump({'model': network}, file)
     
     # model 60x60
@@ -91,7 +91,7 @@ if __name__ == '__main__':
         epochs=10
     )
     network.train(dataset)
-    with open(''.join([args.output, '/DenseNet121_60x60_seed_', str(args.seed), '.pkl'])) as file: 
+    with open(''.join([args.output, '/DenseNet121_60x60_seed_', str(args.seed), '.pkl']), 'wb') as file: 
         pickle.dump({'model': network}, file)
     
     
@@ -109,6 +109,6 @@ if __name__ == '__main__':
         epochs=10
     )
     network.train(dataset)
-    with open(''.join([args.output, '/MultiResolutionNetwork_seed_', str(args.seed), '.pkl'])) as file: 
+    with open(''.join([args.output, '/MultiResolutionNetwork_seed_', str(args.seed), '.pkl']), 'wb') as file: 
         pickle.dump({'model': network}, file)
     
